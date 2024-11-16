@@ -380,7 +380,7 @@ Tabs.AutoFarm:AddButton({
 
 local OthersSection = Tabs.AutoFarm:AddSection("Others")
 
-local Toggle = Tabs.AutoFarm:AddToggle("MyToggle", {Title = "Auto Rebirth", Default = false })
+local Toggle = Tabs.AutoFarm:AddToggle("MyToggle", {Title = "Auto Upgrade", Default = false })
 
 Toggle:OnChanged(function()
     if Toggle.Value then

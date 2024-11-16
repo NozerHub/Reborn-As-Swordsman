@@ -1,0 +1,682 @@
+local placeId = game.PlaceId
+local allowedPlaceId = 16981421605
+
+if placeId ~= allowedPlaceId then
+    return
+end
+
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+local Window = Fluent:CreateWindow({
+    Title = "Reborn As Swordsman ║ Nozer Hub",
+    SubTitle = " Made by NozerHub Beta Version!",
+    TabWidth = 135,
+    Size = UDim2.fromOffset(500, 350),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Credits = Window:AddTab({ Title = "║ Info", Icon = "scroll" }),
+    Settings = Window:AddTab({ Title = "║ UI Settings", Icon = "settings" }),
+    AutoFarm = Window:AddTab({ Title = "║ Auto Farm", Icon = "sword" }), 
+    Teleport = Window:AddTab({ Title = "║ Teleport", Icon = "map" }),
+    Chest = Window:AddTab({ Title = "║ Chest", Icon = "key" }), 
+    Misc = Window:AddTab({ Title = "║ Misc", Icon = "list" }),
+    LocalPlayer = Window:AddTab({ Title = "║ Local Player", Icon = "user" }),
+}
+
+local Options = Fluent.Options
+
+Fluent:Notify({
+    Title = "By Nozer Hub",
+    Content = "Thanks for using the script",
+    Duration = 5
+})
+
+local SupportSection = Tabs.Credits:AddSection("Support")
+Tabs.Credits:AddParagraph({
+    Title = "Supported Devices",
+    Content = "- Mobile\n- PC\n- Emulator\n- Console"
+})
+
+local UpdatesSection = Tabs.Credits:AddSection("Updates")
+Tabs.Credits:AddParagraph({
+    Title = "Updates ✅",
+    Content = "- 16/11/2024"
+})
+
+local SupportSection = Tabs.Credits:AddSection("Support Executors")
+Tabs.Credits:AddParagraph({
+    Title = "Executors",
+    Content = "- Delta\n- Fluxus\n- Arceus X\n- Wave\n- Codex"
+})
+
+local CreditsSection = Tabs.Credits:AddSection("Credits")
+local linkParaCopiar = "https://www.youtube.com/@NozerHub"
+Tabs.Credits:AddButton({
+    Title = "Copy Link Channel",
+    Callback = function()
+        setclipboard(linkParaCopiar)
+    end
+})
+
+local AntiAFKEnabled = true
+local Toggle = Tabs.Misc:AddToggle("MyToggle", { Title = "Anti AFK", Default = true })
+Toggle:OnChanged(function()
+    AntiAFKEnabled = Options.MyToggle.Value
+end)
+Options.MyToggle:SetValue(true)
+
+Tabs.Misc:AddButton({
+    Title = "Server Hop",
+    Callback = function()
+        local TeleportService = game:GetService("TeleportService")
+        local HttpService = game:GetService("HttpService")
+        local placeId = game.PlaceId
+
+        local function serverHop()
+            local servers
+            local cursor = ""
+
+            local success, response = pcall(function()
+                local url = "https://games.roblox.com/v1/games/" .. placeId .. "/servers/Public?sortOrder=Asc&limit=100&cursor=" .. cursor
+                return HttpService:JSONDecode(game:HttpGet(url))
+            end)
+
+            if success and response and response.data then
+                servers = response.data
+            else
+                return
+            end
+
+            for _, server in ipairs(servers) do
+                if server.id ~= game.JobId and server.playing < server.maxPlayers then
+                    TeleportService:TeleportToPlaceInstance(placeId, server.id)
+                    return
+                end
+            end
+
+            if response.nextPageCursor then
+                cursor = response.nextPageCursor
+                serverHop()
+            else
+            end
+        end
+
+        serverHop()
+    end
+})
+
+Tabs.Misc:AddButton({
+    Title = "Rejoin",
+    Callback = function()
+        local TeleportService = game:GetService("TeleportService")
+        local player = game.Players.LocalPlayer
+        TeleportService:Teleport(game.PlaceId, player)
+    end
+})
+
+local Dropdown = Tabs.AutoFarm:AddDropdown("Dropdown", {
+    Title = "Select World",
+    Values = { 
+        "World1", "World2", "World3", "World4", "World5", "World6", 
+        "World7", "World8", "World9", "World10", "World11", "World12", 
+        "World13", "World14", "World15", "World16" -- Adicionando até World16
+    },
+    Multi = false,
+    Default = "World1",  -- Valor padrão da lista, não o índice
+})
+
+local Toggle = Tabs.AutoFarm:AddToggle("AutoTrain", { Title = "Auto TrainPower", Default = false })
+
+-- Callback para o Toggle
+Toggle:OnChanged(function()
+    if Toggle.Value then
+        -- Coloque aqui o código que inicia o treinamento ou a ação desejada
+    else
+        -- Coloque aqui o código que desativa o treinamento ou ação
+    end
+end)
+
+-- Callback para o Dropdown
+Dropdown:OnChanged(function(selectedValue)
+    -- Aqui você pode executar a lógica baseada no mundo selecionado
+end)
+
+local currentTrainPower = nil  -- Variável para controlar o comando ativo
+
+-- Função para executar o comando TrainPower
+local function executeTrainPower(powerName)
+    local args = { [1] = powerName }
+    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Game"):WaitForChild("Re_TrainPower"):FireServer(unpack(args))
+end
+
+Toggle:OnChanged(function(Value)
+    if Value then
+        -- Verifica o valor do dropdown e executa o comando correspondente
+        if Dropdown.Value == "World1" then
+            if currentTrainPower ~= "TrainPower006" then
+                currentTrainPower = "TrainPower006"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower006")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World2" then
+            if currentTrainPower ~= "TrainPower012" then
+                currentTrainPower = "TrainPower012"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower012")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World3" then
+            if currentTrainPower ~= "TrainPower018" then
+                currentTrainPower = "TrainPower018"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower018")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World4" then
+            if currentTrainPower ~= "TrainPower024" then
+                currentTrainPower = "TrainPower024"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower024")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World5" then
+            if currentTrainPower ~= "TrainPower030" then
+                currentTrainPower = "TrainPower030"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower030")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World6" then
+            if currentTrainPower ~= "TrainPower036" then
+                currentTrainPower = "TrainPower036"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower036")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World7" then
+            if currentTrainPower ~= "TrainPower042" then
+                currentTrainPower = "TrainPower042"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower042")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World8" then
+            if currentTrainPower ~= "TrainPower048" then
+                currentTrainPower = "TrainPower048"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower048")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World9" then
+            if currentTrainPower ~= "TrainPower054" then
+                currentTrainPower = "TrainPower054"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower054")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World10" then
+            if currentTrainPower ~= "TrainPower060" then
+                currentTrainPower = "TrainPower060"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower060")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World11" then
+            if currentTrainPower ~= "TrainPower066" then
+                currentTrainPower = "TrainPower066"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower066")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World12" then
+            if currentTrainPower ~= "TrainPower072" then
+                currentTrainPower = "TrainPower072"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower072")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World13" then
+            if currentTrainPower ~= "TrainPower078" then
+                currentTrainPower = "TrainPower078"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower078")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World14" then
+            if currentTrainPower ~= "TrainPower084" then
+                currentTrainPower = "TrainPower084"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower084")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World15" then
+            if currentTrainPower ~= "TrainPower090" then
+                currentTrainPower = "TrainPower090"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower090")
+                    wait(0.1)
+                end
+            end
+        elseif Dropdown.Value == "World16" then
+            if currentTrainPower ~= "TrainPower096" then
+                currentTrainPower = "TrainPower096"
+                while Toggle.Value do
+                    executeTrainPower("TrainPower096")
+                    wait(0.1)
+                end
+            end
+        end
+    else
+        -- Se o toggle for desmarcado, parar a execução do comando
+        currentTrainPower = nil
+    end
+end)
+
+-- Toggle para Auto Click
+local AutoClickToggle = Tabs.AutoFarm:AddToggle("AutoClickToggle", {
+    Title = "Auto Click",  -- Título do toggle
+    Default = false,  -- Estado inicial do toggle
+    Order = 1  -- Define que o toggle ficará no topo da aba
+})
+
+-- Variável para controle de Auto Click
+local AutoClickConnection = nil
+
+AutoClickToggle:OnChanged(function()
+    if AutoClickToggle.Value then
+        -- Ativa o Auto Click quando o toggle estiver ativado
+        AutoClickConnection = task.spawn(function()
+            while AutoClickToggle.Value do
+                task.wait(0.1)  -- Espera 0.1 segundos entre os cliques
+                pcall(function()
+                    -- Envia o comando de Auto Click
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Game"):WaitForChild("Re_TrainPower"):FireServer()
+                end)
+            end
+        end)
+    else
+        -- Cancela a execução do Auto Click quando o toggle for desativado
+        if AutoClickConnection then
+            task.cancel(AutoClickConnection)
+            AutoClickConnection = nil
+        end
+    end
+end)
+
+Tabs.AutoFarm:AddButton({
+    Title = "GodMode",
+    Callback = function()
+        local event = game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Fight"):WaitForChild("Re_NpcDamage")
+        
+        -- Função para bloquear o evento
+        local mt = getrawmetatable(game)
+        local oldNamecall = mt.__namecall
+
+        setreadonly(mt, false)
+
+        mt.__namecall = newcclosure(function(self, ...)
+            local args = {...}
+            local method = getnamecallmethod()
+
+            -- Bloqueia o evento "Re_NpcDamage"
+            if self == event and method == "FireServer" then
+                return nil -- Impede que o evento seja chamado
+            end
+
+            return oldNamecall(self, unpack(args))
+        end)
+
+        setreadonly(mt, true)
+    end
+})
+
+Tabs.AutoFarm:AddButton({
+    Title = "Attack Aura",
+    Callback = function()
+        print("Button was clicked.")
+        
+        -- Inicia o ataque automático quando o botão for pressionado
+        local npcs = {}
+        for i = 1, 275 do
+            table.insert(npcs, "Npc" .. string.format("%03d", i)) -- Adiciona NPC001 até NPC250
+        end
+
+        -- Ataque aos NPCs
+        while true do
+            for _, npc in ipairs(npcs) do
+                local args = {
+                    [1] = npc, -- Ataca o NPC da lista
+                    [2] = 1000 -- Dano ajustado para 1000
+                }
+
+                game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Fight"):WaitForChild("Re_TakeDamage"):FireServer(unpack(args))
+            end
+
+            task.wait(0.5) -- Aguarda 0.5 segundos entre os ataques para evitar sobrecarga
+        end
+    end
+})
+
+local OthersSection = Tabs.AutoFarm:AddSection("Others")
+
+local Toggle = Tabs.AutoFarm:AddToggle("MyToggle", {Title = "Auto Rebirth", Default = false })
+
+Toggle:OnChanged(function()
+    if Toggle.Value then
+        -- Executa o Auto Rebirth enquanto o toggle estiver ativado
+        while Toggle.Value do
+            game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Stats"):WaitForChild("Re_Rebirth"):FireServer()
+            task.wait(1) -- Executa a cada 1 segundo
+        end
+    end
+end)
+
+-- Toggle para Auto Craft All
+local AutoCraftToggle = Tabs.AutoFarm:AddToggle("AutoCraftToggle", {
+    Title = "Auto Craft All Pets",  -- Título do toggle
+    Default = false  -- Estado inicial do toggle
+})
+
+-- Variável para controle de Auto Craft
+local AutoCraftConnection = nil
+
+AutoCraftToggle:OnChanged(function()
+    if AutoCraftToggle.Value then
+        -- Ativa o Auto Craft quando o toggle estiver ativado
+        AutoCraftConnection = task.spawn(function()
+            while AutoCraftToggle.Value do
+                task.wait(0.1)  -- Espera 0.1 segundos entre as ações
+                pcall(function()
+                    -- Envia o comando de Auto Craft All
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Pets"):WaitForChild("Re_CraftAll"):FireServer()
+                end)
+            end
+        end)
+    else
+        -- Cancela a execução do Auto Craft quando o toggle for desativado
+        if AutoCraftConnection then
+            task.cancel(AutoCraftConnection)
+            AutoCraftConnection = nil
+        end
+    end
+end)
+
+-- Toggle para Auto Equip Weapon
+local AutoEquipToggle = Tabs.AutoFarm:AddToggle("AutoEquipToggle", {
+    Title = "Auto Equip Best Swords",  -- Título do toggle
+    Default = false  -- Estado inicial do toggle
+})
+
+-- Variável para controle de Auto Equip
+local AutoEquipConnection = nil
+
+AutoEquipToggle:OnChanged(function()
+    if AutoEquipToggle.Value then
+        -- Ativa o Auto Equip quando o toggle estiver ativado
+        AutoEquipConnection = task.spawn(function()
+            while AutoEquipToggle.Value do
+                task.wait(0.1)  -- Espera 0.1 segundos entre as ações
+                pcall(function()
+                    -- Envia o comando de Auto Equip
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Weapon"):WaitForChild("Re_Equip"):FireServer()
+                end)
+            end
+        end)
+    else
+        -- Cancela a execução do Auto Equip quando o toggle for desativado
+        if AutoEquipConnection then
+            task.cancel(AutoEquipConnection)
+            AutoEquipConnection = nil
+        end
+    end
+end)
+
+-- Toggle para Auto Claim Online Gifts
+local AutoClaimToggle = Tabs.AutoFarm:AddToggle("AutoClaimToggle", {
+    Title = "Auto Claim Gifts",  -- Título do toggle
+    Default = false  -- Estado inicial do toggle
+})
+
+-- Variável para controle do Auto Claim
+local AutoClaimConnection = nil
+
+AutoClaimToggle:OnChanged(function()
+    if AutoClaimToggle.Value then
+        -- Ativa o Auto Claim quando o toggle estiver ativado
+        AutoClaimConnection = task.spawn(function()
+            while AutoClaimToggle.Value do
+                task.wait(1)  -- Espera 1 segundo entre as execuções para não sobrecarregar
+                for i = 1, 12 do
+                    pcall(function()
+                        -- Envia o comando de claim para o gift correspondente
+                        local args = {
+                            [1] = "OnlineGift" .. string.format("%03d", i)  -- Gera o nome do gift, de OnlineGift001 até OnlineGift012
+                        }
+                        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Stats"):WaitForChild("Re_ClaimOnline"):FireServer(unpack(args))
+                    end)
+                end
+            end
+        end)
+    else
+        -- Cancela a execução do Auto Claim quando o toggle for desativado
+        if AutoClaimConnection then
+            task.cancel(AutoClaimConnection)
+            AutoClaimConnection = nil
+        end
+    end
+end)
+
+-- Toggle para Auto UGC Spin
+local AutoSpinToggle = Tabs.AutoFarm:AddToggle("AutoSpinToggle", {
+    Title = "Auto Spin",  -- Título do toggle
+    Default = false  -- Estado inicial do toggle
+})
+
+-- Variável para controle do Auto Spin
+local AutoSpinConnection = nil
+
+AutoSpinToggle:OnChanged(function()
+    if AutoSpinToggle.Value then
+        -- Ativa o Auto Spin quando o toggle estiver ativado
+        AutoSpinConnection = task.spawn(function()
+            while AutoSpinToggle.Value do
+                task.wait(1)  -- Espera 1 segundo entre as execuções para não sobrecarregar
+                pcall(function()
+                    -- Envia o comando de UGC Spin
+                    local args = {
+                        [1] = false  -- Argumento para a função
+                    }
+                    game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Wheel"):WaitForChild("Rf_UGCSpin"):InvokeServer(unpack(args))
+                end)
+            end
+        end)
+    else
+        -- Cancela a execução do Auto Spin quando o toggle for desativado
+        if AutoSpinConnection then
+            task.cancel(AutoSpinConnection)
+            AutoSpinConnection = nil
+        end
+    end
+end)
+
+Tabs.LocalPlayer:AddButton({
+    Title = "Redeem Codes",
+    Callback = function()
+        local codes = { "lol10k", "tx15k", "nice25k", "god35k" } -- Lista de códigos
+        for _, code in ipairs(codes) do
+            local args = {
+                [1] = code
+            }
+            game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Stats"):WaitForChild("Re_RedeemCode"):FireServer(unpack(args))
+        end
+    end
+})
+
+local Toggle = Tabs.LocalPlayer:AddToggle("AutoUsePotions", {Title = "Auto Use Potions", Default = false})
+
+Toggle:OnChanged(function()
+    if Toggle.Value then
+        -- Inicia o uso automático de poções
+        while Toggle.Value do
+            for i = 1, 10 do
+                local args = {
+                    [1] = "Item00" .. i
+                }
+
+                game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Item"):WaitForChild("Re_UsePotion"):FireServer(unpack(args))
+                task.wait(1) -- Aguarda 1 segundo
+            end
+            task.wait(1) -- Aguarda mais 1 segundo antes de reiniciar o loop
+        end
+    end
+end)
+
+local Toggle = Tabs.Chest:AddToggle("MyToggle", {Title = "Auto Chest Bronze", Default = false })
+
+Toggle:OnChanged(function()
+    while Options.MyToggle.Value do
+        local args = {
+            [1] = "Hatch",
+            [2] = "Box001"
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Tower"):WaitForChild("Re_Hatch"):FireServer(unpack(args))
+
+        task.wait(0.1) -- Intervalo ajustado para 0.1 segundos
+    end
+end)
+
+Options.MyToggle:SetValue(false)
+
+local Toggle = Tabs.Chest:AddToggle("MyToggle", {Title = "Auto Chest Golden", Default = false })
+
+Toggle:OnChanged(function()
+    while Options.MyToggle.Value do
+        local args = {
+            [1] = "Hatch",
+            [2] = "Box002"
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Tower"):WaitForChild("Re_Hatch"):FireServer(unpack(args))
+
+        task.wait(0.1) -- Intervalo de 0.1 segundos
+    end
+end)
+
+Options.MyToggle:SetValue(false)
+
+local Toggle = Tabs.Chest:AddToggle("MyToggle", {Title = "Auto Chest Diamond", Default = false })
+
+Toggle:OnChanged(function()
+    while Options.MyToggle.Value do
+        local args = {
+            [1] = "Hatch",
+            [2] = "Box003"
+        }
+
+        game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("Tower"):WaitForChild("Re_Hatch"):FireServer(unpack(args))
+
+        task.wait(0.1) -- Intervalo de 0.1 segundos
+    end
+end)
+
+Options.MyToggle:SetValue(false)
+
+-- Dropdown para selecionar o mundo
+local Dropdown = Tabs.Teleport:AddDropdown("Dropdown", {
+    Title = "Select World",
+    Values = { 
+        "World1", "World2", "World3", "World4", "World5", "World6", 
+        "World7", "World8", "World9", "World10", "World11", "World12", 
+        "World13", "World14", "World15", "World16" -- Até World16
+    },
+    Multi = false,
+    Default = 1,
+})
+
+-- Botão para ativar o teleporte
+Tabs.Teleport:AddButton({
+    Title = "teleport",
+    Callback = function()
+        local worldName = nil
+        if Dropdown.Value == "World1" then
+            worldName = "World001"
+        elseif Dropdown.Value == "World2" then
+            worldName = "World002"
+        elseif Dropdown.Value == "World3" then
+            worldName = "World003"
+        elseif Dropdown.Value == "World4" then
+            worldName = "World004"
+        elseif Dropdown.Value == "World5" then
+            worldName = "World005"
+        elseif Dropdown.Value == "World6" then
+            worldName = "World006"
+        elseif Dropdown.Value == "World7" then
+            worldName = "World007"
+        elseif Dropdown.Value == "World8" then
+            worldName = "World008"
+        elseif Dropdown.Value == "World9" then
+            worldName = "World009"
+        elseif Dropdown.Value == "World10" then
+            worldName = "World010"
+        elseif Dropdown.Value == "World11" then
+            worldName = "World011"
+        elseif Dropdown.Value == "World12" then
+            worldName = "World012"
+        elseif Dropdown.Value == "World13" then
+            worldName = "World013"
+        elseif Dropdown.Value == "World14" then
+            worldName = "World014"
+        elseif Dropdown.Value == "World15" then
+            worldName = "World015"
+        elseif Dropdown.Value == "World16" then
+            worldName = "World016"
+        end
+
+        if worldName then
+            -- Executa o comando de teleporte
+            local args = { [1] = worldName }
+            game:GetService("ReplicatedStorage"):WaitForChild("Events"):WaitForChild("World"):WaitForChild("Rf_TeleportToWorld"):InvokeServer(unpack(args))
+        end
+    end
+})
+
+-- Configurações de Interface e Salvar Configurações
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+Fluent:Notify({
+    Title = "Fluent",
+    Content = "The script has been loaded.",
+    Duration = 5
+})
+
+SaveManager:LoadAutoloadConfig()

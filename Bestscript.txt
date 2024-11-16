@@ -358,7 +358,7 @@ Tabs.AutoFarm:AddButton({
         
         -- Inicia o ataque automático quando o botão for pressionado
         local npcs = {}
-        for i = 1, 275 do
+        for i = 1, 155 do
             table.insert(npcs, "Npc" .. string.format("%03d", i)) -- Adiciona NPC001 até NPC250
         end
 

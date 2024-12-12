@@ -46,8 +46,8 @@ Tabs.Credits:AddButton({
     end
 })
 
-Tabs.Info:AddParagraph({ Title = "Owner: Nozer Hub" })
-Tabs.Info:AddParagraph({ Title = "Update 12/12" })
+Tabs.Credits:AddParagraph({ Title = "Owner: Nozer Hub" })
+Tabs.Credits:AddParagraph({ Title = "Update 12/12" })
 
 local AntiAFKEnabled = true
 local Toggle = Tabs.Misc:AddToggle("MyToggle", { Title = "Anti AFK", Default = true })

@@ -14,7 +14,7 @@ local Window = Fluent:CreateWindow({
     SubTitle = "",
     TabWidth = 135,
     Size = UDim2.fromOffset(500, 350),
-    Acrylic = true,
+    Acrylic = false,
     Theme = "Dark",
     MinimizeKey = Enum.KeyCode.LeftControl
 })
@@ -37,7 +37,6 @@ Fluent:Notify({
     Duration = 5
 })
 
-local CreditsSection = Tabs.Credits:AddSection("Credits")
 local linkParaCopiar = "https://www.youtube.com/@NozerHub"
 Tabs.Credits:AddButton({
     Title = "Copy Link Channel",
@@ -704,6 +703,8 @@ Toggle:OnChanged(function()
 end)
 
 Toggle:SetValue(false)
+
+Window:SelectTab(1)
 
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)

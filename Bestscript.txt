@@ -661,7 +661,7 @@ Tabs.Teleport:AddButton({
     end
 })
 
-local WalkSpeedSection = Tabs.Player:AddSection("WalkSpeed")
+local WalkSpeedSection = Tabs.LocalPlayer:AddSection("WalkSpeed")
 
 local player = game:GetService("Players").LocalPlayer
 local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")

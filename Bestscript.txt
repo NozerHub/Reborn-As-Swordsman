@@ -10,8 +10,8 @@ local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/d
 local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
 
 local Window = Fluent:CreateWindow({
-    Title = "Reborn As Swordsman ║ Nozer Hub",
-    SubTitle = " Made by NozerHub Beta Version!",
+    Title = game:GetService("MarketplaceService"):GetProductInfo(16981421605).Name .. " | Nozer Hub",
+    SubTitle = "",
     TabWidth = 135,
     Size = UDim2.fromOffset(500, 350),
     Acrylic = true,
@@ -20,13 +20,13 @@ local Window = Fluent:CreateWindow({
 })
 
 local Tabs = {
-    Credits = Window:AddTab({ Title = "║ Info", Icon = "scroll" }),
-    Settings = Window:AddTab({ Title = "║ UI Settings", Icon = "settings" }),
-    AutoFarm = Window:AddTab({ Title = "║ Auto Farm", Icon = "sword" }), 
-    Teleport = Window:AddTab({ Title = "║ Teleport", Icon = "map" }),
-    Chest = Window:AddTab({ Title = "║ Chest", Icon = "key" }), 
-    Misc = Window:AddTab({ Title = "║ Misc", Icon = "list" }),
-    LocalPlayer = Window:AddTab({ Title = "║ Local Player", Icon = "user" }),
+    Credits = Window:AddTab({ Title = "Info", Icon = "info" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" }),
+    AutoFarm = Window:AddTab({ Title = "Auto Farm", Icon = "activity" }), 
+    Teleport = Window:AddTab({ Title = "Teleport", Icon = "map-pin" }),
+    Chest = Window:AddTab({ Title = "Chest", Icon = "box" }), 
+    Misc = Window:AddTab({ Title = "Misc", Icon = "codesandbox" }),
+    LocalPlayer = Window:AddTab({ Title = "Player", Icon = "user" }),
 }
 
 local Options = Fluent.Options
@@ -35,24 +35,6 @@ Fluent:Notify({
     Title = "By Nozer Hub",
     Content = "Thanks for using the script",
     Duration = 5
-})
-
-local SupportSection = Tabs.Credits:AddSection("Support")
-Tabs.Credits:AddParagraph({
-    Title = "Supported Devices",
-    Content = "- Mobile\n- PC\n- Emulator\n- Console"
-})
-
-local UpdatesSection = Tabs.Credits:AddSection("Updates")
-Tabs.Credits:AddParagraph({
-    Title = "Updates ✅",
-    Content = "- 16/11/2024"
-})
-
-local SupportSection = Tabs.Credits:AddSection("Support Executors")
-Tabs.Credits:AddParagraph({
-    Title = "Executors",
-    Content = "- Delta\n- Fluxus\n- Arceus X\n- Wave\n- Codex"
 })
 
 local CreditsSection = Tabs.Credits:AddSection("Credits")
@@ -64,12 +46,29 @@ Tabs.Credits:AddButton({
     end
 })
 
+Tabs.Info:AddParagraph({ Title = "Owner: Nozer Hub" })
+Tabs.Info:AddParagraph({ Title = "Update 12/12" })
+
 local AntiAFKEnabled = true
 local Toggle = Tabs.Misc:AddToggle("MyToggle", { Title = "Anti AFK", Default = true })
+
 Toggle:OnChanged(function()
-    AntiAFKEnabled = Options.MyToggle.Value
+    AntiAFKEnabled = Toggle.Value  -- Corrigido aqui
 end)
-Options.MyToggle:SetValue(true)
+
+Toggle:SetValue(true)
+
+local VirtualUser = game:GetService("VirtualUser")
+local Players = game:GetService("Players")
+local LocalPlayer = Players.LocalPlayer
+
+LocalPlayer.Idled:Connect(function()
+    if AntiAFKEnabled then
+        VirtualUser:Button2Down(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+        task.wait(1)
+        VirtualUser:Button2Up(Vector2.new(0, 0), workspace.CurrentCamera.CFrame)
+    end
+end)
 
 Tabs.Misc:AddButton({
     Title = "Server Hop",
@@ -662,7 +661,50 @@ Tabs.Teleport:AddButton({
     end
 })
 
--- Configurações de Interface e Salvar Configurações
+local WalkSpeedSection = Tabs.Player:AddSection("WalkSpeed")
+
+local player = game:GetService("Players").LocalPlayer
+local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+
+-- Definindo o valor Default com base no WalkSpeed do jogador
+local defaultWalkSpeed = humanoid and humanoid.WalkSpeed or 16
+
+local Input = Tabs.LocalPlayer:AddInput("SpeedInput", {
+    Title = "Write WalkSpeed", 
+    Default = tostring(defaultWalkSpeed),  -- Configurando o Default para a velocidade atual
+    Placeholder = "Enter Speed", 
+    Numeric = true, 
+    Finished = true, 
+    Callback = function(Value) 
+    end
+})
+
+Input:OnChanged(function() end)
+
+local Toggle = Tabs.LocalPlayer:AddToggle("SpeedToggle", {
+    Title = "Apply WalkSpeed", 
+    Default = false
+})
+
+Toggle:OnChanged(function()
+    local humanoid = player.Character and player.Character:FindFirstChild("Humanoid")
+    if humanoid then
+        if Toggle.Value then
+            while Toggle.Value do
+                local inputSpeed = tonumber(Input.Value)  -- Acessando o valor corretamente
+                if inputSpeed and inputSpeed >= 16 then
+                    humanoid.WalkSpeed = inputSpeed
+                end
+                wait(0.5)
+            end
+        else
+            humanoid.WalkSpeed = 16
+        end
+    end
+end)
+
+Toggle:SetValue(false)
+
 SaveManager:SetLibrary(Fluent)
 InterfaceManager:SetLibrary(Fluent)
 SaveManager:IgnoreThemeSettings()
@@ -671,12 +713,3 @@ InterfaceManager:SetFolder("FluentScriptHub")
 SaveManager:SetFolder("FluentScriptHub/specific-game")
 InterfaceManager:BuildInterfaceSection(Tabs.Settings)
 SaveManager:BuildConfigSection(Tabs.Settings)
-
-Window:SelectTab(1)
-Fluent:Notify({
-    Title = "Fluent",
-    Content = "The script has been loaded.",
-    Duration = 5
-})
-
-SaveManager:LoadAutoloadConfig()

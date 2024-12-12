@@ -31,6 +31,93 @@ local Tabs = {
 
 local Options = Fluent.Options
 
+getgenv().ED_AntiKick = {
+    Enabled = true,
+    CheckCaller = true
+}
+
+if getgenv().ED_AntiKick then
+    return
+end
+
+local Players, StarterGui, OldNamecall = game:GetService("Players"), game:GetService("StarterGui")
+
+getgenv().ED_AntiKick = {
+    Enabled = true,
+    CheckCaller = true
+}
+
+-- Bypass
+
+local function GetClosestSpawn(targetPos)
+    local RealTarget
+    if type(targetPos) == "Vector3" then
+        RealTarget = targetPos
+    elseif type(targetPos) == "userdata" and targetPos.Position then
+        RealTarget = targetPos.Position
+    elseif type(targetPos) == "number" then
+        RealTarget = CFrame.new(targetPos).Position
+    else
+        return nil -- Retorna nil se targetPos for inválido
+    end
+    
+    local CheckInOut = math.huge
+    local ReturnValue = nil
+    
+    local playerTeam = game.Players.LocalPlayer.Team
+    if playerTeam then
+        local teamSpawns = game.Workspace._WorldOrigin.PlayerSpawns:FindFirstChild(tostring(playerTeam))
+        if teamSpawns then
+            for _, spawn in pairs(teamSpawns:GetChildren()) do
+                local spawnPosition = spawn:GetModelCFrame().p
+                local ReMagnitude = (RealTarget - spawnPosition).Magnitude
+                if ReMagnitude < CheckInOut then
+                    CheckInOut = ReMagnitude
+                    ReturnValue = spawn.Name
+                end
+            end
+        end
+    end
+    
+    return ReturnValue
+end
+
+local function toTarget(targetPos)
+    if not targetPos then return end
+    
+    local RealTarget
+    if type(targetPos) == "Vector3" then
+        RealTarget = CFrame.new(targetPos)
+    elseif type(targetPos) == "userdata" then
+        RealTarget = targetPos
+    elseif type(targetPos) == "number" then
+        RealTarget = CFrame.new(targetPos)
+    end
+
+    local character = game.Players.LocalPlayer.Character
+    if not character or not character:FindFirstChild("Humanoid") then return end
+
+    local humanoid = character:WaitForChild("Humanoid")
+    if humanoid.Health == 0 then
+        repeat wait() until humanoid.Health > 0
+    end
+
+    local Distance = (RealTarget.Position - character.HumanoidRootPart.Position).Magnitude
+    local Speed = Distance > 1000 and 300 or 315
+    
+    if Distance < 1000 then
+        -- Add logic for small distance travel
+    end
+
+    if Distance > 3000 then
+        pcall(function()
+            if character:WaitForChild("Humanoid") then
+                character.HumanoidRootPart.CFrame = RealTarget
+            end
+        end)
+    end
+end
+
 Fluent:Notify({
     Title = "By Nozer Hub",
     Content = "Thanks for using the script",
